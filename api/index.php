@@ -1109,7 +1109,7 @@ foreach ($modules as $key => $module) {
             <div class="photo-inner">
 
                 <img
-                    src="/images/photo.jpg"
+                    src="../public/images/oumi.jpg"
                     alt="Photo de Oumaima Elharti"
                 >
 
