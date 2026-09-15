@@ -1,840 +1,1563 @@
 <?php
-// Portfolio de Oumaima Elharti
+
+/* =========================================================
+   OUMAIMA ELHARTI - PORTFOLIO
+   Développement Digital - 2ème année
+   ========================================================= */
+// Les 6 modules
+$modules = [
+    "m201" => [
+        "code" => "M201",
+        "title" => "Préparation du projet web",
+        "icon" => "🌐",
+        "description" => "Conception et préparation des projets web."
+    ],
+
+    "m202" => [
+        "code" => "M202",
+        "title" => "Approche agile",
+        "icon" => "⚡",
+        "description" => "Méthodes agiles, organisation et gestion de projet."
+    ],
+
+    "m203" => [
+        "code" => "M203",
+        "title" => "Gestion de données",
+        "icon" => "🗄️",
+        "description" => "Bases de données, SQL et gestion des données."
+    ],
+
+    "m204" => [
+        "code" => "M204",
+        "title" => "Développement front-end",
+        "icon" => "💻",
+        "description" => "Création d'interfaces web modernes et interactives."
+    ],
+
+    "m205" => [
+        "code" => "M205",
+        "title" => "Développement back-end",
+        "icon" => "⚙️",
+        "description" => "PHP, programmation serveur et développement back-end."
+    ],
+
+    "m206" => [
+        "code" => "M206",
+        "title" => "Création d'une application Cloud Native",
+        "icon" => "☁️",
+        "description" => "Découverte des applications Cloud Native et du déploiement."
+    ]
+];
+
+
+/* =========================================================
+   Récupérer automatiquement les PDF de chaque module
+   ========================================================= */
+
+function getDocuments($module)
+{
+    $folder = __DIR__ . "/../public/docs/" . $module;
+
+    if (!is_dir($folder)) {
+        return [];
+    }
+
+    $files = scandir($folder);
+    $documents = [];
+
+    foreach ($files as $file) {
+
+        if ($file === "." || $file === ".." || $file === ".gitkeep") {
+            continue;
+        }
+
+        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+        if ($extension === "pdf") {
+
+            $documents[] = [
+                "name" => pathinfo($file, PATHINFO_FILENAME),
+                "file" => $file
+            ];
+        }
+    }
+
+    return $documents;
+}
+
+
+/* =========================================================
+   Compter les documents
+   ========================================================= */
+
+$totalDocuments = 0;
+
+foreach ($modules as $key => $module) {
+    $modules[$key]["documents"] = getDocuments($key);
+    $modules[$key]["count"] = count($modules[$key]["documents"]);
+
+    $totalDocuments += $modules[$key]["count"];
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Oumaima Elharti | Portfolio</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <meta name="description"
-        content="Portfolio professionnel de Oumaima Elharti, étudiante en Développement Digital.">
+          content="Portfolio professionnel de Oumaima Elharti, étudiante en Développement Digital.">
+
+    <title>Oumaima Elharti | Développeuse Web</title>
+
 
     <style>
+
+        /* =====================================================
+           RESET
+           ===================================================== */
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+
+        html {
             scroll-behavior: smooth;
         }
 
+
         body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #fff9fc;
-            color: #2d2630;
-            line-height: 1.6;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b16;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        /* =========================
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        /* =====================================================
+           BACKGROUND
+           ===================================================== */
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: #7c3aed;
+            filter: blur(180px);
+            opacity: .18;
+            border-radius: 50%;
+            top: -200px;
+            left: -150px;
+            z-index: -2;
+            animation: moveGlow 8s infinite alternate ease-in-out;
+        }
+
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            background: #06b6d4;
+            filter: blur(180px);
+            opacity: .13;
+            border-radius: 50%;
+            bottom: -150px;
+            right: -100px;
+            z-index: -2;
+            animation: moveGlow2 10s infinite alternate ease-in-out;
+        }
+
+
+        @keyframes moveGlow {
+
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(180px, 100px);
+            }
+        }
+
+
+        @keyframes moveGlow2 {
+
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(-150px, -100px);
+            }
+        }
+
+
+        /* =====================================================
            NAVBAR
-        ========================= */
+           ===================================================== */
 
         nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 18px 8%;
-            background: rgba(255, 249, 252, 0.95);
-            backdrop-filter: blur(10px);
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(1100px, 92%);
+            padding: 15px 25px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            background: rgba(10, 14, 30, .72);
+            backdrop-filter: blur(20px);
+
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 18px;
+
             z-index: 1000;
-            border-bottom: 1px solid #f1dce7;
+
+            animation: navDown 1s ease;
         }
+
+
+        @keyframes navDown {
+
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #b85c82;
-            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
         }
+
 
         .logo span {
-            color: #5f5261;
+            color: #8b5cf6;
         }
 
-        nav ul {
-            list-style: none;
+
+        .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 25px;
+            list-style: none;
         }
 
-        nav ul li a {
-            text-decoration: none;
-            color: #403640;
-            font-weight: 500;
-            transition: 0.3s;
+
+        .nav-links a {
+            color: #cbd5e1;
+            font-size: 14px;
+            transition: .3s;
+            position: relative;
         }
 
-        nav ul li a:hover {
-            color: #b85c82;
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #8b5cf6;
+            bottom: -7px;
+            left: 50%;
+            transition: .3s;
         }
 
-        /* =========================
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+
+        .nav-links a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+
+        /* =====================================================
            HERO
-        ========================= */
+           ===================================================== */
 
         .hero {
             min-height: 100vh;
-            padding: 140px 8% 80px;
+            max-width: 1150px;
+            margin: auto;
 
-            display: flex;
+            padding: 140px 30px 80px;
+
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
             align-items: center;
-            justify-content: space-between;
-            gap: 60px;
-
-            background:
-                radial-gradient(circle at 85% 20%, #f7dce8 0, transparent 25%),
-                radial-gradient(circle at 10% 80%, #eee1f4 0, transparent 25%),
-                #fff9fc;
+            gap: 70px;
         }
 
-        .hero-content {
-            max-width: 650px;
+
+        .hero-text {
+            animation: heroLeft 1s ease forwards;
         }
+
+
+        @keyframes heroLeft {
+
+            from {
+                opacity: 0;
+                transform: translateX(-70px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
 
         .small-title {
-            color: #b85c82;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
+            display: inline-block;
+            padding: 8px 15px;
+
+            border: 1px solid rgba(139,92,246,.5);
+            background: rgba(139,92,246,.1);
+
+            border-radius: 30px;
+
+            color: #c4b5fd;
+            font-size: 13px;
+            margin-bottom: 20px;
         }
 
-        .hero h1 {
-            font-size: clamp(45px, 6vw, 75px);
-            line-height: 1.05;
-            margin-bottom: 25px;
-            color: #302832;
+
+        h1 {
+            font-size: clamp(45px, 7vw, 78px);
+            line-height: 1;
+            margin-bottom: 20px;
         }
 
-        .hero h1 span {
-            color: #b85c82;
+
+        h1 span {
+            color: #8b5cf6;
         }
 
-        .hero p {
-            font-size: 19px;
-            color: #716672;
+
+        .hero-text h2 {
+            color: #cbd5e1;
+            font-size: 23px;
+            margin-bottom: 20px;
+        }
+
+
+        .hero-text p {
+            color: #94a3b8;
             max-width: 600px;
-            margin-bottom: 35px;
+            line-height: 1.8;
+            font-size: 16px;
         }
+
 
         .buttons {
             display: flex;
             gap: 15px;
+            margin-top: 30px;
             flex-wrap: wrap;
         }
 
+
         .btn {
-            display: inline-block;
-            padding: 13px 25px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.3s;
+            padding: 13px 22px;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: .3s;
         }
+
 
         .btn-primary {
-            background: #b85c82;
-            color: white;
-            box-shadow: 0 10px 25px rgba(184, 92, 130, 0.25);
+            background: #7c3aed;
         }
+
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            background: #a94d73;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(124,58,237,.35);
         }
 
-        .btn-secondary {
-            border: 1px solid #d8a8bd;
-            color: #9d4d70;
-            background: white;
+
+        .btn-outline {
+            border: 1px solid rgba(255,255,255,.15);
+            color: #cbd5e1;
         }
 
-        .btn-secondary:hover {
-            background: #f9e8f0;
+
+        .btn-outline:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-5px);
         }
 
-        /* =========================
-           PROFILE CARD
-        ========================= */
 
-        .profile-card {
-            width: 330px;
-            min-width: 280px;
-            padding: 35px;
+        /* =====================================================
+           PHOTO CARD
+           ===================================================== */
 
-            background: rgba(255, 255, 255, 0.75);
-            border: 1px solid #efd9e5;
-            border-radius: 30px;
-
-            text-align: center;
-
-            box-shadow: 0 25px 60px rgba(100, 65, 90, 0.12);
-        }
-
-        .profile-circle {
-            width: 150px;
-            height: 150px;
-            margin: auto auto 20px;
-
-            border-radius: 50%;
-
-            background: linear-gradient(135deg, #f1cbdc, #e8d9ef);
-
+        .photo-container {
             display: flex;
-            align-items: center;
             justify-content: center;
 
-            color: #9d4d70;
-            font-size: 50px;
-            font-weight: 700;
+            animation: heroRight 1.2s ease forwards;
         }
 
-        .profile-card h3 {
-            margin-bottom: 8px;
+
+        @keyframes heroRight {
+
+            from {
+                opacity: 0;
+                transform: translateX(70px) scale(.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
 
-        .profile-card p {
-            color: #817580;
+
+        .photo-card {
+            width: 360px;
+            height: 470px;
+
+            position: relative;
+
+            padding: 10px;
+
+            border-radius: 35px;
+
+            background: linear-gradient(
+                135deg,
+                #8b5cf6,
+                #06b6d4,
+                #8b5cf6
+            );
+
+            background-size: 300% 300%;
+
+            animation:
+                gradientMove 5s ease infinite,
+                floating 5s ease-in-out infinite;
+
+            box-shadow:
+                0 0 80px rgba(139,92,246,.25);
         }
 
-        /* =========================
-           GENERAL SECTIONS
-        ========================= */
+
+        @keyframes gradientMove {
+
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+
+        @keyframes floating {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+
+        .photo-inner {
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
+            border-radius: 27px;
+
+            background: #111827;
+            position: relative;
+        }
+
+
+        .photo-inner img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            object-position: center;
+
+            transition: .7s;
+        }
+
+
+        .photo-card:hover img {
+            transform: scale(1.07);
+        }
+
+
+        /* =====================================================
+           FLOATING BADGES
+           ===================================================== */
+
+        .badge {
+            position: absolute;
+
+            padding: 10px 15px;
+
+            background: rgba(15,23,42,.9);
+            border: 1px solid rgba(255,255,255,.1);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 12px;
+
+            font-size: 13px;
+
+            z-index: 5;
+
+            box-shadow: 0 10px 30px rgba(0,0,0,.3);
+        }
+
+
+        .badge-one {
+            top: 30px;
+            left: -45px;
+            animation: badgeFloat 4s infinite ease-in-out;
+        }
+
+
+        .badge-two {
+            bottom: 40px;
+            right: -45px;
+            animation: badgeFloat 4s infinite ease-in-out 1s;
+        }
+
+
+        @keyframes badgeFloat {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+
+        /* =====================================================
+           SECTIONS
+           ===================================================== */
 
         section {
-            padding: 100px 8%;
+            max-width: 1150px;
+            margin: auto;
+            padding: 100px 30px;
         }
+
 
         .section-title {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 55px;
         }
 
-        .section-title span {
-            color: #b85c82;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+
+        .section-title small {
+            color: #8b5cf6;
+            font-weight: bold;
         }
+
 
         .section-title h2 {
             font-size: 40px;
             margin-top: 8px;
         }
 
+
         .section-title p {
-            color: #7b707b;
-            max-width: 650px;
-            margin: 15px auto 0;
+            color: #94a3b8;
+            margin-top: 12px;
         }
 
-        /* =========================
+
+        /* =====================================================
            ABOUT
-        ========================= */
-
-        .about {
-            background: white;
-        }
-
-        .about-container {
-            max-width: 1000px;
-            margin: auto;
-
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
+           ===================================================== */
 
         .about-box {
-            padding: 35px;
+            padding: 40px;
+
+            background: rgba(255,255,255,.035);
+            border: 1px solid rgba(255,255,255,.08);
+
             border-radius: 25px;
-            background: #fff8fb;
-            border: 1px solid #f1dce7;
+
+            line-height: 1.9;
+            color: #cbd5e1;
+
+            transition: .4s;
         }
 
-        .about-box h3 {
-            margin-bottom: 15px;
-            color: #9d4d70;
+
+        .about-box:hover {
+            transform: translateY(-7px);
+            border-color: rgba(139,92,246,.5);
         }
 
-        .about-box p {
-            color: #6f646e;
+
+        .about-box strong {
+            color: white;
         }
 
-        /* =========================
-           SKILLS
-        ========================= */
 
-        .skills {
-            background: #fff9fc;
-        }
+        /* =====================================================
+           MODULES
+           ===================================================== */
 
-        .skills-container {
-            max-width: 1100px;
-            margin: auto;
-
+        .modules-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
-        .skill-card {
-            padding: 30px;
-            background: white;
-            border: 1px solid #f0dce6;
+
+        .module-card {
+            padding: 28px;
+
+            min-height: 270px;
+
+            background: rgba(255,255,255,.035);
+
+            border: 1px solid rgba(255,255,255,.08);
+
             border-radius: 22px;
-            transition: 0.3s;
+
+            position: relative;
+
+            overflow: hidden;
+
+            transition: .4s;
         }
 
-        .skill-card:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 15px 35px rgba(100, 65, 90, 0.10);
+
+        .module-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 100px;
+            height: 100px;
+
+            background: #8b5cf6;
+
+            filter: blur(70px);
+
+            opacity: 0;
+
+            right: -20px;
+            top: -20px;
+
+            transition: .4s;
         }
 
-        .skill-card .icon {
-            font-size: 32px;
-            margin-bottom: 15px;
+
+        .module-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(139,92,246,.6);
         }
 
-        .skill-card h3 {
-            margin-bottom: 8px;
+
+        .module-card:hover::before {
+            opacity: .4;
         }
 
-        .skill-card p {
-            color: #776d76;
+
+        .module-icon {
+            font-size: 35px;
+            margin-bottom: 18px;
         }
 
-        /* =========================
+
+        .module-code {
+            color: #8b5cf6;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+
+        .module-card h3 {
+            margin: 8px 0 12px;
+            font-size: 20px;
+        }
+
+
+        .module-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+        .documents {
+            margin-top: 20px;
+        }
+
+
+        .documents-title {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+
+        .document {
+            display: block;
+
+            padding: 9px 11px;
+
+            margin-bottom: 7px;
+
+            background: rgba(255,255,255,.04);
+
+            border-radius: 8px;
+
+            color: #a5b4fc;
+
+            font-size: 12px;
+
+            transition: .3s;
+        }
+
+
+        .document:hover {
+            background: rgba(139,92,246,.15);
+            transform: translateX(5px);
+        }
+
+
+        .no-doc {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
            PROJECTS
-        ========================= */
+           ===================================================== */
 
-        .projects {
-            background: white;
-        }
-
-        .projects-container {
-            max-width: 1100px;
-            margin: auto;
-
+        .projects-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
-        .project-card {
+
+        .project {
             padding: 30px;
 
-            border-radius: 25px;
-            border: 1px solid #efdce6;
+            border-radius: 22px;
 
-            background: linear-gradient(
-                145deg,
-                #fff,
-                #fff7fa
-            );
+            background: rgba(255,255,255,.035);
 
-            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,.08);
+
+            transition: .4s;
         }
 
-        .project-card:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 15px 40px rgba(100, 65, 90, 0.10);
+
+        .project:hover {
+            transform: translateY(-8px);
+            border-color: rgba(139,92,246,.5);
         }
 
-        .project-number {
-            color: #b85c82;
-            font-weight: 700;
+
+        .project h3 {
+            margin-bottom: 12px;
+        }
+
+
+        .project p {
+            color: #94a3b8;
+            line-height: 1.7;
             font-size: 14px;
         }
 
-        .project-card h3 {
-            margin: 12px 0;
+
+        /* =====================================================
+           SKILLS
+           ===================================================== */
+
+        .skills {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
         }
 
-        .project-card p {
-            color: #756b74;
-            margin-bottom: 20px;
+
+        .skill {
+            padding: 22px;
+
+            background: rgba(255,255,255,.035);
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            border-radius: 15px;
+
+            transition: .3s;
         }
 
-        .project-link {
-            text-decoration: none;
-            color: #a34f73;
-            font-weight: 600;
+
+        .skill:hover {
+            transform: scale(1.03);
+            border-color: #8b5cf6;
         }
 
-        /* =========================
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+
+        .skill-top span:last-child {
+            color: #8b5cf6;
+        }
+
+
+        .bar {
+            height: 6px;
+            background: #1e293b;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+
+        .bar span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg,#8b5cf6,#06b6d4);
+
+            animation: loadBar 2s ease;
+        }
+
+
+        @keyframes loadBar {
+
+            from {
+                width: 0;
+            }
+        }
+
+
+        /* =====================================================
            CONTACT
-        ========================= */
+           ===================================================== */
 
-        .contact {
-            background: #f8e8f0;
+        .contact-box {
             text-align: center;
+
+            padding: 60px 30px;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(124,58,237,.12),
+                    rgba(6,182,212,.08)
+                );
+
+            border: 1px solid rgba(255,255,255,.1);
         }
 
-        .contact-content {
-            max-width: 700px;
-            margin: auto;
-        }
 
-        .contact h2 {
-            font-size: 40px;
+        .contact-box h2 {
+            font-size: 35px;
             margin-bottom: 15px;
         }
 
-        .contact p {
-            color: #6e626c;
-            margin-bottom: 30px;
+
+        .contact-box p {
+            color: #94a3b8;
+            margin-bottom: 25px;
         }
 
-        /* =========================
+
+        /* =====================================================
            FOOTER
-        ========================= */
+           ===================================================== */
 
         footer {
-            padding: 25px;
             text-align: center;
-            background: #2f2830;
-            color: #e9dfe5;
+
+            padding: 30px;
+
+            border-top: 1px solid rgba(255,255,255,.08);
+
+            color: #64748b;
+
+            font-size: 13px;
         }
 
-        footer span {
-            color: #e7a9c3;
-        }
 
-        /* =========================
+        /* =====================================================
            RESPONSIVE
-        ========================= */
+           ===================================================== */
 
         @media (max-width: 900px) {
 
             .hero {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 text-align: center;
             }
 
-            .hero p {
-                margin-left: auto;
-                margin-right: auto;
+            .hero-text p {
+                margin: auto;
             }
 
             .buttons {
                 justify-content: center;
             }
 
-            .skills-container,
-            .projects-container {
-                grid-template-columns: 1fr 1fr;
+            .modules-grid,
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
+            .skills {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .photo-container {
+                margin-top: 30px;
+            }
         }
+
 
         @media (max-width: 650px) {
 
             nav {
-                padding: 15px 5%;
+                padding: 14px 16px;
             }
 
-            nav ul {
+            .nav-links {
                 display: none;
             }
 
-            section {
-                padding: 80px 5%;
+            .hero {
+                padding-top: 120px;
             }
 
-            .about-container,
-            .skills-container,
-            .projects-container {
+            .photo-card {
+                width: 280px;
+                height: 380px;
+            }
+
+            .badge-one {
+                left: -10px;
+            }
+
+            .badge-two {
+                right: -10px;
+            }
+
+            .modules-grid,
+            .projects-grid,
+            .skills {
                 grid-template-columns: 1fr;
             }
 
-            .profile-card {
-                width: 100%;
+            section {
+                padding: 70px 20px;
             }
 
+            .section-title h2 {
+                font-size: 32px;
+            }
+
+            .about-box {
+                padding: 25px;
+            }
         }
 
     </style>
+
 </head>
+
 
 <body>
 
-    <!-- =========================
-         NAVBAR
-    ========================== -->
 
-    <nav>
+<!-- =====================================================
+     NAVBAR
+     ===================================================== -->
 
-        <a href="/" class="logo">
-            Oumaima<span>.</span>
-        </a>
+<nav>
 
-        <ul>
-            <li><a href="#accueil">Accueil</a></li>
-            <li><a href="#about">À propos</a></li>
-            <li><a href="#skills">Compétences</a></li>
-            <li><a href="#projects">Projets</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+    <a href="#home" class="logo">
+        Oumaima<span>.</span>
+    </a>
 
-    </nav>
+    <ul class="nav-links">
 
+        <li><a href="#about">About</a></li>
 
-    <!-- =========================
-         HERO
-    ========================== -->
+        <li><a href="#modules">Modules</a></li>
 
-    <section class="hero" id="accueil">
+        <li><a href="#projects">Projects</a></li>
 
-        <div class="hero-content">
+        <li><a href="#skills">Skills</a></li>
 
-            <div class="small-title">
-                Portfolio professionnel
-            </div>
+        <li><a href="#contact">Contact</a></li>
 
-            <h1>
-                Bonjour, je suis
-                <span>Oumaima.</span>
-            </h1>
+    </ul>
 
-            <p>
-                Étudiante en Développement Digital, passionnée par
-                la création de solutions web modernes, élégantes
-                et fonctionnelles.
-            </p>
+</nav>
 
-            <div class="buttons">
 
-                <a href="#projects" class="btn btn-primary">
-                    Découvrir mes projets
-                </a>
 
-                <a href="#contact" class="btn btn-secondary">
-                    Me contacter
-                </a>
+<!-- =====================================================
+     HERO
+     ===================================================== -->
 
-            </div>
+<header class="hero" id="home">
 
-        </div>
 
+    <div class="hero-text">
 
-        <div class="profile-card">
+        <span class="small-title">
+            👩‍💻 Développement Digital · 2ème année
+        </span>
 
-            <div class="profile-circle">
-                OE
-            </div>
 
-            <h3>Oumaima Elharti</h3>
+        <h1>
+            Hi, I'm <span>Oumaima</span>
+        </h1>
 
-            <p>
-                Développement Digital
-            </p>
 
-            <p>
-                2ème année
-            </p>
+        <h2>
+            Étudiante en Développement Digital
+        </h2>
 
-        </div>
 
-    </section>
+        <p>
+            Je suis une étudiante passionnée par le développement web
+            et la création de solutions numériques modernes.
+            Découvrez mon parcours, mes compétences et les travaux
+            que je réalise durant ma formation.
+        </p>
 
 
-    <!-- =========================
-         ABOUT
-    ========================== -->
+        <div class="buttons">
 
-    <section class="about" id="about">
+            <a href="#modules" class="btn btn-primary">
+                Voir mes modules →
+            </a>
 
-        <div class="section-title">
-
-            <span>À propos</span>
-
-            <h2>Mon parcours</h2>
-
-            <p>
-                Un espace dédié à mon évolution et aux compétences
-                développées durant ma formation.
-            </p>
-
-        </div>
-
-
-        <div class="about-container">
-
-            <div class="about-box">
-
-                <h3>Qui suis-je ?</h3>
-
-                <p>
-                    Je suis Oumaima Elharti, étudiante en deuxième
-                    année de Développement Digital à l'ISTA.
-                    À travers ma formation, je développe progressivement
-                    mes compétences en programmation, développement web
-                    et gestion de bases de données.
-                </p>
-
-            </div>
-
-
-            <div class="about-box">
-
-                <h3>Mon objectif</h3>
-
-                <p>
-                    Construire une expérience solide dans le développement
-                    web et créer des projets utiles, modernes et bien
-                    structurés tout en continuant à améliorer mes
-                    compétences techniques.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         SKILLS
-    ========================== -->
-
-    <section class="skills" id="skills">
-
-        <div class="section-title">
-
-            <span>Compétences</span>
-
-            <h2>Ce que j'apprends</h2>
-
-            <p>
-                Les technologies et domaines étudiés durant ma formation.
-            </p>
-
-        </div>
-
-
-        <div class="skills-container">
-
-            <div class="skill-card">
-
-                <div class="icon">🌐</div>
-
-                <h3>M201</h3>
-
-                <p>
-                    Préparation d'un projet web
-                </p>
-
-            </div>
-
-
-            <div class="skill-card">
-
-                <div class="icon">⚡</div>
-
-                <h3>M202</h3>
-
-                <p>
-                    Approche agile
-                </p>
-
-            </div>
-
-
-            <div class="skill-card">
-
-                <div class="icon">💻</div>
-
-                <h3>M203</h3>
-
-                <p>
-                    Gestion des données
-                </p>
-
-            </div>
-
-
-            <div class="skill-card">
-
-                <div class="icon">🗄️</div>
-
-                <h3>M204</h3>
-
-                <p>
-                    Développement front end
-                </p>
-
-            </div>
-
-
-            <div class="skill-card">
-
-                <div class="icon">✨</div>
-
-                <h3>M205
-                </h3>
-
-                <p>
-                    Développement back end
-                </p>
-
-            </div>
-
-
-            <div class="skill-card">
-
-                <div class="icon">🔗</div>
-
-                <h3>M206</h3>
-
-                <p>
-                    
-                Création d'une application cloud native
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         PROJECTS
-    ========================== -->
-
-    <section class="projects" id="projects">
-
-        <div class="section-title">
-
-            <span>Mon travail</span>
-
-            <h2>Projets & Travaux</h2>
-
-            <p>
-                Retrouvez ici mes TP, TD, exercices et projets réalisés
-                durant ma formation.
-            </p>
-
-        </div>
-
-
-        <div class="projects-container">
-
-            <div class="project-card">
-
-                <div class="project-number">
-                    01 — PHP
-                </div>
-
-                <h3>Travaux PHP</h3>
-
-                <p>
-                    Exercices et travaux pratiques réalisés
-                    en PHP et PDO.
-                </p>
-
-                <a href="#" class="project-link">
-                    Voir le travail →
-                </a>
-
-            </div>
-
-
-            <div class="project-card">
-
-                <div class="project-number">
-                    02 — JavaScript
-                </div>
-
-                <h3>Travaux JavaScript</h3>
-
-                <p>
-                    Exercices de manipulation du DOM,
-                    événements et validation.
-                </p>
-
-                <a href="#" class="project-link">
-                    Voir le travail →
-                </a>
-
-            </div>
-
-
-            <div class="project-card">
-
-                <div class="project-number">
-                    03 — Projet
-                </div>
-
-                <h3>Mes futurs projets</h3>
-
-                <p>
-                    Cette section évoluera avec les nouveaux
-                    projets réalisés durant ma formation.
-                </p>
-
-                <a href="#" class="project-link">
-                    Voir le travail →
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         CONTACT
-    ========================== -->
-
-    <section class="contact" id="contact">
-
-        <div class="contact-content">
-
-            <h2>Travaillons ensemble</h2>
-
-            <p>
-                Vous souhaitez découvrir mon parcours,
-                mes travaux ou échanger avec moi ?
-            </p>
-
-            <a href="mailto:tonemail@example.com"
-               class="btn btn-primary">
-
+            <a href="#contact" class="btn btn-outline">
                 Me contacter
-
             </a>
 
         </div>
 
-    </section>
+    </div>
 
 
-    <!-- =========================
-         FOOTER
-    ========================== -->
 
-    <footer>
+    <!-- PHOTO -->
+
+    <div class="photo-container">
+
+        <div class="photo-card">
+
+            <div class="photo-inner">
+
+                <img
+                    src="/images/photo.jpg"
+                    alt="Photo de Oumaima Elharti"
+                >
+
+            </div>
+
+
+            <div class="badge badge-one">
+                ✨ Web Developer
+            </div>
+
+
+            <div class="badge badge-two">
+                💻 HTML · CSS · JS
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     ABOUT
+     ===================================================== -->
+
+<section id="about">
+
+    <div class="section-title">
+
+        <small>ABOUT ME</small>
+
+        <h2>À propos de moi</h2>
 
         <p>
-            © 2026 <span>Oumaima Elharti</span> —
-            Portfolio professionnel
+            Mon parcours et ma passion pour le développement digital
         </p>
 
-    </footer>
+    </div>
+
+
+    <div class="about-box">
+
+        <p>
+
+            Je suis <strong>Oumaima Elharti</strong>, étudiante en
+            <strong>2ème année de Développement Digital</strong>.
+
+            <br><br>
+
+            Passionnée par le développement web et la création
+            de solutions numériques, je développe progressivement
+            mes compétences à travers différents
+            <strong>TD et TP</strong> réalisés durant ma formation.
+
+            <br><br>
+
+            Au cours de mon parcours, j'ai travaillé avec plusieurs
+            technologies telles que
+            <strong>HTML, CSS, JavaScript, PHP, SQL et Python</strong>.
+
+            <br><br>
+
+            Ce portfolio présente mon évolution, mes compétences,
+            mes projets ainsi que les différents travaux réalisés
+            dans chacun de mes modules.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     MODULES
+     ===================================================== -->
+
+<section id="modules">
+
+    <div class="section-title">
+
+        <small>MY LEARNING</small>
+
+        <h2>Mes Modules</h2>
+
+        <p>
+            Retrouvez mes TD et TP réalisés dans chaque module.
+        </p>
+
+    </div>
+
+
+    <div class="modules-grid">
+
+
+        <?php foreach ($modules as $folder => $module): ?>
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    <?= $module["icon"] ?>
+                </div>
+
+
+                <span class="module-code">
+                    <?= htmlspecialchars($module["code"]) ?>
+                </span>
+
+
+                <h3>
+                    <?= htmlspecialchars($module["title"]) ?>
+                </h3>
+
+
+                <p>
+                    <?= htmlspecialchars($module["description"]) ?>
+                </p>
+
+
+                <div class="documents">
+
+                    <div class="documents-title">
+                        📁 Travaux :
+                    </div>
+
+
+                    <?php if (!empty($module["documents"])): ?>
+
+                        <?php foreach ($module["documents"] as $document): ?>
+
+                            <?php
+                            /*
+                             * rawurlencode permet aux espaces
+                             * dans les noms PDF de fonctionner.
+                             */
+
+                            $url = "/docs/"
+                                 . $folder
+                                 . "/"
+                                 . rawurlencode($document["file"]);
+                            ?>
+
+
+                            <a
+                                href="<?= htmlspecialchars($url) ?>"
+                                target="_blank"
+                                class="document"
+                            >
+
+                                📄
+                                <?= htmlspecialchars($document["name"]) ?>
+
+                            </a>
+
+
+                        <?php endforeach; ?>
+
+                    <?php else: ?>
+
+                        <span class="no-doc">
+                            Aucun document pour le moment.
+                        </span>
+
+                    <?php endif; ?>
+
+                </div>
+
+            </article>
+
+        <?php endforeach; ?>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     PROJECTS
+     ===================================================== -->
+
+<section id="projects">
+
+    <div class="section-title">
+
+        <small>MY WORK</small>
+
+        <h2>Projects</h2>
+
+        <p>
+            Quelques exemples de travaux et projets réalisés.
+        </p>
+
+    </div>
+
+
+    <div class="projects-grid">
+
+
+        <div class="project">
+
+            <h3>🌐 Web Development</h3>
+
+            <p>
+                Création de pages web modernes avec HTML et CSS,
+                accompagnées d'interactions JavaScript.
+            </p>
+
+        </div>
+
+
+        <div class="project">
+
+            <h3>🗄️ Database</h3>
+
+            <p>
+                Création et gestion de bases de données SQL,
+                requêtes et manipulation des données.
+            </p>
+
+        </div>
+
+
+        <div class="project">
+
+            <h3>⚙️ PHP Application</h3>
+
+            <p>
+                Développement d'applications web dynamiques
+                avec PHP et PDO.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SKILLS
+     ===================================================== -->
+
+<section id="skills">
+
+    <div class="section-title">
+
+        <small>MY SKILLS</small>
+
+        <h2>Compétences</h2>
+
+        <p>
+            Technologies étudiées durant ma formation.
+        </p>
+
+    </div>
+
+
+    <div class="skills">
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>HTML</span>
+                <span>90%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:90%"></span>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>CSS</span>
+                <span>85%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:85%"></span>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>JavaScript</span>
+                <span>75%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:75%"></span>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>PHP</span>
+                <span>80%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:80%"></span>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>SQL</span>
+                <span>80%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:80%"></span>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span>Python</span>
+                <span>65%</span>
+            </div>
+
+            <div class="bar">
+                <span style="width:65%"></span>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CONTACT
+     ===================================================== -->
+
+<section id="contact">
+
+    <div class="contact-box">
+
+        <h2>Let's work together ✨</h2>
+
+        <p>
+            Vous souhaitez découvrir mon travail ou échanger avec moi ?
+        </p>
+
+
+        <a
+            href="mailto:oumaima.elharti@example.com"
+            class="btn btn-primary"
+        >
+            ✉ Me contacter
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<footer>
+
+    © <?= date("Y") ?> Oumaima Elharti · Portfolio
+
+</footer>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+    /* Animation quand on arrive sur les sections */
+
+    const sections = document.querySelectorAll("section");
+
+
+    const observer = new IntersectionObserver(
+
+        function(entries) {
+
+            entries.forEach(function(entry) {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.style.opacity = "1";
+
+                    entry.target.style.transform = "translateY(0)";
+
+                }
+
+            });
+
+        },
+
+        {
+            threshold: 0.12
+        }
+
+    );
+
+
+    sections.forEach(function(section) {
+
+        section.style.opacity = "0";
+
+        section.style.transform = "translateY(40px)";
+
+        section.style.transition = "opacity .8s ease, transform .8s ease";
+
+        observer.observe(section);
+
+    });
+
+
+</script>
+
 
 </body>
-
 </html>
