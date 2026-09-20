@@ -54,16 +54,54 @@ $modules = [
    Récupérer automatiquement les PDF de chaque module
    ========================================================= */
 
+/* =========================================================
+   Récupérer automatiquement les dossiers et PDF
+   ========================================================= */
+
 function getDocuments($module)
 {
-    $folder = __DIR__ . "/../public/docs/" . $module;
+    /*
+     * Le code fonctionne avec la structure :
+     * public/docs/m201/UML/Atelier1/TD1.pdf
+     * public/docs/m201/FIGMA/Atelier1/TD1.pdf
+     * etc.
+     */
 
-    if (!is_dir($folder)) {
+    $possibleFolders = [
+        __DIR__ . "/../public/docs/" . $module,
+        __DIR__ . "/public/docs/" . $module
+    ];
+
+    $folder = null;
+
+    foreach ($possibleFolders as $possibleFolder) {
+        if (is_dir($possibleFolder)) {
+            $folder = $possibleFolder;
+            break;
+        }
+    }
+
+    if ($folder === null) {
         return [];
     }
 
+    return scanFolder($folder);
+}
+
+
+/* =========================================================
+   Scanner les dossiers récursivement
+   ========================================================= */
+
+function scanFolder($folder)
+{
+    $items = [];
+
+    if (!is_dir($folder)) {
+        return $items;
+    }
+
     $files = scandir($folder);
-    $documents = [];
 
     foreach ($files as $file) {
 
@@ -71,18 +109,146 @@ function getDocuments($module)
             continue;
         }
 
-        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $fullPath = $folder . DIRECTORY_SEPARATOR . $file;
 
-        if ($extension === "pdf") {
+        /* Dossier */
+        if (is_dir($fullPath)) {
 
-            $documents[] = [
-                "name" => pathinfo($file, PATHINFO_FILENAME),
-                "file" => $file
+            $items[] = [
+                "type" => "folder",
+                "name" => $file,
+                "children" => scanFolder($fullPath)
             ];
+
+        /* Fichier PDF */
+        } else {
+
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+            if ($extension === "pdf") {
+
+                $items[] = [
+                    "type" => "file",
+                    "name" => pathinfo($file, PATHINFO_FILENAME),
+                    "file" => $file
+                ];
+            }
         }
     }
 
-    return $documents;
+    return $items;
+}
+
+
+/* =========================================================
+   Compter tous les PDF, même dans les sous-dossiers
+   ========================================================= */
+
+function countDocuments($items)
+{
+    $count = 0;
+
+    foreach ($items as $item) {
+
+        if ($item["type"] === "file") {
+            $count++;
+        } elseif ($item["type"] === "folder") {
+            $count += countDocuments($item["children"]);
+        }
+    }
+
+    return $count;
+}
+
+
+/* =========================================================
+   Créer l'URL d'un PDF
+   ========================================================= */
+
+function documentUrl($module, $relativePath)
+{
+    $scriptDirectory = str_replace(
+        "\\",
+        "/",
+        dirname($_SERVER["SCRIPT_NAME"] ?? "")
+    );
+
+    /*
+     * Si index.php est dans /api :
+     * ../public/docs/...
+     * Sinon :
+     * public/docs/...
+     */
+    if (basename($scriptDirectory) === "api") {
+        $base = "../public/docs";
+    } else {
+        $base = "public/docs";
+    }
+
+    $parts = explode("/", trim($relativePath, "/"));
+    $encodedParts = [];
+
+    foreach ($parts as $part) {
+        $encodedParts[] = rawurlencode($part);
+    }
+
+    return $base . "/" . rawurlencode($module) . "/" . implode("/", $encodedParts);
+}
+
+
+/* =========================================================
+   Afficher les dossiers et PDF automatiquement
+   ========================================================= */
+
+function renderDocuments($items, $module, $relativePath = "", $level = 0)
+{
+    if (empty($items)) {
+        return;
+    }
+
+    foreach ($items as $item) {
+
+        if ($item["type"] === "folder") {
+
+            $folderPath = $relativePath === ""
+                ? $item["name"]
+                : $relativePath . "/" . $item["name"];
+
+            echo '<div class="document-folder level-' . $level . '">';
+
+            echo '<div class="folder-title">';
+            echo $level === 0 ? "📁 " : "📂 ";
+            echo htmlspecialchars($item["name"]);
+            echo '</div>';
+
+            if (!empty($item["children"])) {
+                renderDocuments(
+                    $item["children"],
+                    $module,
+                    $folderPath,
+                    $level + 1
+                );
+            } else {
+                echo '<div class="empty-folder">Aucun document pour le moment.</div>';
+            }
+
+            echo '</div>';
+
+        } else {
+
+            $filePath = $relativePath === ""
+                ? $item["file"]
+                : $relativePath . "/" . $item["file"];
+
+            $url = documentUrl($module, $filePath);
+
+            echo '<a href="' . htmlspecialchars($url) . '"';
+            echo ' target="_blank"';
+            echo ' class="document">';
+            echo '📄 ' . htmlspecialchars($item["name"]);
+            echo '</a>';
+        }
+    }
 }
 
 
@@ -93,8 +259,9 @@ function getDocuments($module)
 $totalDocuments = 0;
 
 foreach ($modules as $key => $module) {
+
     $modules[$key]["documents"] = getDocuments($key);
-    $modules[$key]["count"] = count($modules[$key]["documents"]);
+    $modules[$key]["count"] = countDocuments($modules[$key]["documents"]);
 
     $totalDocuments += $modules[$key]["count"];
 }
@@ -775,6 +942,40 @@ foreach ($modules as $key => $module) {
             font-size: 12px;
         }
 
+        .document-folder {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,.025);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 12px;
+        }
+
+        .folder-title {
+            color: #c4b5fd;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .document-folder.level-1 {
+            margin-left: 12px;
+            background: rgba(139,92,246,.035);
+        }
+
+        .document-folder.level-2 {
+            margin-left: 12px;
+        }
+
+        .empty-folder {
+            color: #64748b;
+            font-size: 12px;
+            padding: 5px 0;
+        }
+
+        .sub-document {
+            margin-left: 8px;
+        }
+
 
         /* =====================================================
            PROJECTS
@@ -1238,37 +1439,14 @@ foreach ($modules as $key => $module) {
                         📁 Travaux :
                     </div>
 
-
                     <?php if (!empty($module["documents"])): ?>
 
-                        <?php foreach ($module["documents"] as $document): ?>
-
-                            <?php
-                            /*
-                             * rawurlencode permet aux espaces
-                             * dans les noms PDF de fonctionner.
-                             */
-
-                            $url = "/docs/"
-                                 . $folder
-                                 . "/"
-                                 . rawurlencode($document["file"]);
-                            ?>
-
-
-                            <a
-                                href="<?= htmlspecialchars($url) ?>"
-                                target="_blank"
-                                class="document"
-                            >
-
-                                📄
-                                <?= htmlspecialchars($document["name"]) ?>
-
-                            </a>
-
-
-                        <?php endforeach; ?>
+                        <?php
+                        renderDocuments(
+                            $module["documents"],
+                            $folder
+                        );
+                        ?>
 
                     <?php else: ?>
 
