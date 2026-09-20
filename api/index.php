@@ -1,3 +1,4 @@
+
 <?php
 
 /* =========================================================
@@ -200,8 +201,12 @@ function documentUrl($module, $relativePath)
    Afficher les dossiers et PDF automatiquement
    ========================================================= */
 
+$folderCounter = 0;
+
 function renderDocuments($items, $module, $relativePath = "", $level = 0)
 {
+    global $folderCounter;
+
     if (empty($items)) {
         return;
     }
@@ -214,12 +219,21 @@ function renderDocuments($items, $module, $relativePath = "", $level = 0)
                 ? $item["name"]
                 : $relativePath . "/" . $item["name"];
 
+            $folderId = "folder_" . (++$folderCounter);
+
             echo '<div class="document-folder level-' . $level . '">';
 
-            echo '<div class="folder-title">';
-            echo $level === 0 ? "📁 " : "📂 ";
+            echo '<button type="button" class="folder-title"';
+            echo ' onclick="toggleFolder(\'' . $folderId . '\', this)"';
+            echo ' aria-expanded="false"';
+            echo ' aria-controls="' . $folderId . '">';
+            echo '<span class="folder-arrow">▶</span>';
+            echo '<span>' . ($level === 0 ? "📁 " : "📂 ");
             echo htmlspecialchars($item["name"]);
-            echo '</div>';
+            echo '</span>';
+            echo '</button>';
+
+            echo '<div id="' . $folderId . '" class="folder-content">';
 
             if (!empty($item["children"])) {
                 renderDocuments(
@@ -232,6 +246,7 @@ function renderDocuments($items, $module, $relativePath = "", $level = 0)
                 echo '<div class="empty-folder">Aucun document pour le moment.</div>';
             }
 
+            echo '</div>';
             echo '</div>';
 
         } else {
@@ -943,18 +958,64 @@ foreach ($modules as $key => $module) {
         }
 
         .document-folder {
-            margin-top: 12px;
-            padding: 10px;
+            margin-top: 10px;
+            padding: 8px;
             background: rgba(255,255,255,.025);
             border: 1px solid rgba(255,255,255,.06);
             border-radius: 12px;
         }
 
         .folder-title {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 4px;
+            border: 0;
+            background: transparent;
             color: #c4b5fd;
+            font-family: inherit;
             font-size: 13px;
             font-weight: bold;
-            margin-bottom: 8px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: .25s;
+        }
+
+        .folder-title:hover {
+            background: rgba(139,92,246,.10);
+        }
+
+        .folder-arrow {
+            display: inline-block;
+            font-size: 10px;
+            transition: transform .25s ease;
+        }
+
+        .folder-title[aria-expanded="true"] .folder-arrow {
+            transform: rotate(90deg);
+        }
+
+        .folder-content {
+            display: none;
+            padding: 4px 0 2px;
+        }
+
+        .folder-content.open {
+            display: block;
+            animation: folderOpen .25s ease;
+        }
+
+        @keyframes folderOpen {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .document-folder.level-1 {
@@ -962,18 +1023,15 @@ foreach ($modules as $key => $module) {
             background: rgba(139,92,246,.035);
         }
 
-        .document-folder.level-2 {
+        .document-folder.level-2,
+        .document-folder.level-3 {
             margin-left: 12px;
         }
 
         .empty-folder {
             color: #64748b;
             font-size: 12px;
-            padding: 5px 0;
-        }
-
-        .sub-document {
-            margin-left: 8px;
+            padding: 7px 4px;
         }
 
 
@@ -1732,6 +1790,24 @@ foreach ($modules as $key => $module) {
         observer.observe(section);
 
     });
+
+
+    /* =====================================================
+       Ouvrir / fermer UML, FIGMA, Atelier1, etc.
+       ===================================================== */
+
+    function toggleFolder(folderId, button) {
+
+        const folder = document.getElementById(folderId);
+
+        if (!folder) {
+            return;
+        }
+
+        const isOpen = folder.classList.toggle("open");
+
+        button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
 
 
 </script>
