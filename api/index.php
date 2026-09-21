@@ -69,8 +69,9 @@ function getDocuments($module)
      */
 
     $possibleFolders = [
-        
-        __DIR__ . "/docs/" . $module
+        __DIR__ . "/../public/docs/" . $module,   // api/index.php → public/docs
+        __DIR__ . "/public/docs/" . $module,      // index.php à la racine
+        __DIR__ . "/docs/" . $module,             // docs à côté de index.php
     ];
 
     $folder = null;
