@@ -69,7 +69,7 @@ function getDocuments($module)
      */
 
     $possibleFolders = [
-        __DIR__ . "/docs/" . $module,
+        
         __DIR__ . "/docs/" . $module
     ];
 
