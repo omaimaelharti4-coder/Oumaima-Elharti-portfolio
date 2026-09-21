@@ -69,8 +69,8 @@ function getDocuments($module)
      */
 
     $possibleFolders = [
-        __DIR__ . "/../public/docs/" . $module,
-        __DIR__ . "/public/docs/" . $module
+        __DIR__ . "/docs/" . $module,
+        __DIR__ . "/docs/" . $module
     ];
 
     $folder = null;
@@ -166,26 +166,38 @@ function countDocuments($items)
    Créer l'URL d'un PDF
    ========================================================= */
 
+// function documentUrl($module, $relativePath)
+// {
+//     $scriptDirectory = str_replace(
+//         "\\",
+//         "/",
+//         dirname($_SERVER["SCRIPT_NAME"] ?? "")
+//     );
+
+//     /*
+//      * Si index.php est dans /api :
+//      * ../public/docs/...
+//      * Sinon :
+//      * public/docs/...
+//      */
+//     if (basename($scriptDirectory) === "api") {
+//         $base = "../public/docs";
+//     } else {
+//         $base = "public/docs";
+//     }
+
+//     $parts = explode("/", trim($relativePath, "/"));
+//     $encodedParts = [];
+
+//     foreach ($parts as $part) {
+//         $encodedParts[] = rawurlencode($part);
+//     }
+
+
+//     return $base . "/" . rawurlencode($module) . "/" . implode("/", $encodedParts);
+// }
 function documentUrl($module, $relativePath)
 {
-    $scriptDirectory = str_replace(
-        "\\",
-        "/",
-        dirname($_SERVER["SCRIPT_NAME"] ?? "")
-    );
-
-    /*
-     * Si index.php est dans /api :
-     * ../public/docs/...
-     * Sinon :
-     * public/docs/...
-     */
-    if (basename($scriptDirectory) === "api") {
-        $base = "../public/docs";
-    } else {
-        $base = "public/docs";
-    }
-
     $parts = explode("/", trim($relativePath, "/"));
     $encodedParts = [];
 
@@ -193,9 +205,9 @@ function documentUrl($module, $relativePath)
         $encodedParts[] = rawurlencode($part);
     }
 
-    return $base . "/" . rawurlencode($module) . "/" . implode("/", $encodedParts);
+    // Chemin absolu depuis la racine du site
+    return "/docs/" . rawurlencode($module) . "/" . implode("/", $encodedParts);
 }
-
 
 /* =========================================================
    Afficher les dossiers et PDF automatiquement
